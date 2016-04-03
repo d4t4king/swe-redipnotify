@@ -1,0 +1,15 @@
+old_ip=
+email_auth_password=
+red_iface=
+ssh_auth_user=
+email=
+email_ssl=false
+email_auth_user=
+email_smtp_server=
+new_ip=
+notify_method=email
+current_ip=
+email_smtp_port=25
+notify=disabled
+ssh_target=
+ssh_auth_key_file=
