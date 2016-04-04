@@ -12,7 +12,7 @@ use header qw( :standard );
 use smoothtype qw( :standard );
 use strict;
 
-my %cgiparams;
+my (%cgiparams,%redchangesettings);
 my $errormessage = "";
 my ($lastToken, $newToken, $rtnToken);
 my $tmp = "";
@@ -48,6 +48,8 @@ $cgiparams{'ACTION_DIAL'} = '';
 
 &getcgihash(\%cgiparams);
 $rtnToken = $cgiparams{'Token'};
+
+&readhash("$swroot/mods/redipnotify/settings", \%redchangesettings);
 
 if ($cgiparams{'ACTION_ADMIN'} eq $tr{'save'} or $cgiparams{'ACTION_DIAL'} eq $tr{'save'})
 {
@@ -130,7 +132,7 @@ if ($cgiparams{'ACTION_DIAL'} eq $tr{'save'})
 	}
 }
 
-&openpage($tr{'change passwords'}, 1, '', 'maintenance');
+&openpage($tr{'rcn page title: red change notification'}, 1, '', 'maintenance');
 
 &openbigbox('100%', 'LEFT');
 
@@ -139,44 +141,43 @@ if ($cgiparams{'ACTION_DIAL'} eq $tr{'save'})
 print "<form method='post'>\n";
 	print "  <input type='hidden' name='Token' value='$newToken'>\n";
 
-&openbox($tr{'administrator user password'});
+&openbox($tr{'rcn box title: red change notification'});
 print <<END;
-  <table width='100%'>
-  <tr>
-      <td width='15%' class='base'>$tr{'password'}</td>
-      <td width='30%'>
-        <input type='password' name='ADMIN_PASSWORD1' id='admin_password1'
-               @{[jsvalidpassword('admin_password1','admin_password2','^([^ \|]*)$')]}>
-      </td>
-      <td width='15%' class='base'>$tr{'again'}</td>
-      <td width='30%'>
-        <input type='password' name='ADMIN_PASSWORD2' id='admin_password2'
-               @{[jsvalidpassword('admin_password2','admin_password1','^([^ \|]*)$')]}>
-      </td>
-      <td width='10%'><input type='submit' name='ACTION_ADMIN' value='$tr{'save'}'></td>
-  </tr>
-  </table>
-END
-
-&closebox();
-
-&openbox($tr{'dial user password'});
-print <<END;
-  <table width='100%'>
-    <tr>
-      <td width='15%' class='base'>$tr{'password'}</td>
-      <td width='30%'>
-        <input type='password' name='DIAL_PASSWORD1' id='dial_password1'
-               @{[jsvalidpassword('dial_password1','dial_password2','^([^ \|]*)$')]}>
-      </td>
-      <td width='15%' class='base'>$tr{'again'}</td>
-      <td width='30%'>
-        <input type='password' name='DIAL_PASSWORD2' id='dial_password2'
-               @{[jsvalidpassword('dial_password2','dial_password1','^([^ \|]*)$')]} >
-      </td>
-      <td width='10%'><input type='submit' name='ACTION_DIAL' value='$tr{'save'}'></td>
-    </tr>
-  </table>
+	<table width='100%'>
+		<tr>
+			<td width='30%' class='base'>$tr{'rcnEnable'}</td>
+			<td width='15%'>
+				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" />
+			</td>
+			<td width='25%' class='base'>$tr{'rcnddlMethod'}</td>
+			<td width='20%'>
+				<select name="ddlRCNMethod" id="ddlRCNMethod" value="$redchangesettings{'notify_method'}">
+					<option value="">&nbsp;</option>
+					<option value="email">Email</option>
+					<option value="ssh">SSH</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td width='20%' class='base'>$tr{'rcnEmailAddr'}</td>
+			<td width='25%'>
+				<input type="text" id="txtRCNEmailAddr" name="rcnEmailAddr" value="$redchangesettings{'email'}" />
+			</td>
+			<td width='25%' class='base'>$tr{'rcnEmailSSL'}</td>
+			<td width='20%'>
+				<input type="checkbox" id="cbxRCNSSL" name="cbxRCNSSL" />
+			</td>
+		</tr>
+		<tr>
+			<td width="30%" class='base'>$tr{'rcnEmailServer'}</td>
+			<td width="60%">
+				<input type="textbox" id="txtRCNEmailServer" name="txtRCNEmailServer" value="$redchangesettings{'email_smtp_server'}" />
+			</td>
+		</tr>
+		<tr>
+			<td width='10%'><input type='submit' name='ACTION_ADMIN' value='$tr{'save'}'></td>
+		</tr>
+	</table>
 END
 
 &closebox();
