@@ -153,8 +153,20 @@ print <<END;
 			<td width='20%'>
 				<select name="ddlRCNMethod" id="ddlRCNMethod" value="$redchangesettings{'notify_method'}">
 					<option value="">&nbsp;</option>
-					<option value="email">Email</option>
-					<option value="ssh">SSH</option>
+END
+	if ($redchangesettings{'notify_method'} eq "email") {
+		print "\t\t\t\t\t<option value=\"email\" selected>Email</option>\n";
+		print "\t\t\t\t\t<option value=\"ssh\">SSH</option>\n";
+	} elsif ($redchangesettings{'notify_method'} eq "ssh") {
+		print "\t\t\t\t\t<option value=\"email\">Email</option>\n";
+		print "\t\t\t\t\t<option value=\"ssh\" selected>SSH</option>\n";
+	} else {
+		print "\t\t\t\t\t<option value=\"email\">Email</option>\n";
+		print "\t\t\t\t\t<option value=\"ssh\">SSH</option>\n";
+		$errormessage = "Unrecognized notification method!";
+	}
+print <<END;
+
 				</select>
 			</td>
 		</tr>
@@ -182,7 +194,7 @@ print <<END;
 						</td>
 					</tr>
 				</table>
-			</td
+			</td>
 		</tr>
 		<tr>
 			<td class='base'>$tr{'rcnEmailAuthUser'}</td>
@@ -192,6 +204,26 @@ print <<END;
 			<td class="base">$tr{'rcnEmailAuthPass'}</td>
 			<td>
 				<input type="text" id="txtRCNEmailAuthPass" name="txtRCNEmailAuthPass" value="$redchangesettings{'email_auth_password'}" />
+			</td>
+		</tr>
+		<tr>
+			<td class='base'>$tr{'rcnSSHServer'}</td>
+			<td>
+				<input type="text" size="25" id="txtRCNSSHServer" name="txtRCNSSHServer" value="$redchangesettings{'ssh_server'}" />
+			</td>
+			<td class='base'>$tr{'rcnSSHPort'}</td>
+			<td>
+				<input type="text" size="5" id="txtRCNSSHPort" name="txtRCNSSHPort" value="$redchangesettings{'ssh_port'}" />
+			</td>
+		</tr>
+		<tr>
+			<td class='base'>$tr{'rcnSSHAuthUser'}</td>
+			<td>
+				<input type="text" size="25" id="txtRCNSSHAuthUser" name="txtRCNSSHAuthUser" value="$redchangesettings{'ssh_auth_user'}" />
+			</td>
+			<td class="base">$tr{'rcnSSHAuthKey'}</td>
+			<td>
+				<input type="text" id="txtRCNSSHAuthKey" name="txtRCNSSHAuthKey" value="$redchangesettings{'ssh_auth_key'}" />
 			</td>
 		</tr>
 		<tr>
