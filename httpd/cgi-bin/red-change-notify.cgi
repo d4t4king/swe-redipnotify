@@ -139,11 +139,11 @@ if ($cgiparams{'ACTION_DIAL'} eq $tr{'save'})
 &alertbox($errormessage);
 
 print "<form method='post'>\n";
-	print "  <input type='hidden' name='Token' value='$newToken'>\n";
+print "  <input type='hidden' name='Token' value='$newToken'>\n";
 
 &openbox($tr{'rcn box title: red change notification'});
 print <<END;
-	<table width='100%'>
+	<table width='100%' border="0">
 		<tr>
 			<td width='30%' class='base'>$tr{'rcnEnable'}</td>
 			<td width='15%'>
@@ -159,23 +159,44 @@ print <<END;
 			</td>
 		</tr>
 		<tr>
-			<td width='20%' class='base'>$tr{'rcnEmailAddr'}</td>
-			<td width='25%'>
-				<input type="text" id="txtRCNEmailAddr" name="rcnEmailAddr" value="$redchangesettings{'email'}" />
-			</td>
-			<td width='25%' class='base'>$tr{'rcnEmailSSL'}</td>
-			<td width='20%'>
-				<input type="checkbox" id="cbxRCNSSL" name="cbxRCNSSL" />
+			<td class='base'>$tr{'rcnEmailAddr'}</td>
+			<td colspan='3'>
+				<input type="text" size="45" id="txtRCNEmailAddr" name="txtRCNEmailAddr" value="$redchangesettings{'email'}" />
 			</td>
 		</tr>
 		<tr>
-			<td width="30%" class='base'>$tr{'rcnEmailServer'}</td>
-			<td width="60%">
-				<input type="textbox" id="txtRCNEmailServer" name="txtRCNEmailServer" value="$redchangesettings{'email_smtp_server'}" />
+			<td class='base'>$tr{'rcnEmailServer'}</td>
+			<td>
+				<input type="text" size="25" id="txtRCNEmailServer" name="txtRCNEmailServer" value="$redchangesettings{'email_smtp_server'}" />
+			</td>
+			<td colspan='2'>
+				<table width="100%" border="0">
+					<tr>
+						<td class='base'>$tr{'rcnEmailPort'}</td>
+						<td>
+							<input type="text" size="5" id="txtRCNEmailPort" name="txtRCNEmailPort" value="$redchangesettings{'email_smtp_port'}" />
+						</td>
+						<td class='base' width="12.5%">$tr{'rcnEmailSSL'}</td>
+						<td width="7%">
+							<input type="checkbox" id="cbxRCNSSL" name="cbxRCNSSL" />
+						</td>
+					</tr>
+				</table>
+			</td
+		</tr>
+		<tr>
+			<td class='base'>$tr{'rcnEmailAuthUser'}</td>
+			<td>
+				<input type="text" size="25" id="txtRCNEmailAuthUser" name="txtRCNEmailAuthUser" value="$redchangesettings{'email_auth_user'}" />
+			</td>
+			<td class="base">$tr{'rcnEmailAuthPass'}</td>
+			<td>
+				<input type="text" id="txtRCNEmailAuthPass" name="txtRCNEmailAuthPass" value="$redchangesettings{'email_auth_password'}" />
 			</td>
 		</tr>
 		<tr>
-			<td width='10%'><input type='submit' name='ACTION_ADMIN' value='$tr{'save'}'></td>
+			<td class='base' width="30%">&nbsp;</td>
+			<td colspan="3" width='60%'><input type='submit' name='ACTION_ADMIN' value='$tr{'save'}'></td>
 		</tr>
 	</table>
 END

@@ -11,5 +11,8 @@
 	'rcnEmailAddr'								=>	'Recipient Email Address:',
 	'rcnEmailSSL'								=>	'SSL:',
 	'rcnEmailServer'							=>	'Email SMTP Server:',
+	'rcnEmailPort'								=>	'SMTP Port:',
+	'rcnEmailAuthUser'							=>	'Email Auth User:',
+	'rcnEmailAuthPass'							=>	'Email Auth Password:',
 
 );
