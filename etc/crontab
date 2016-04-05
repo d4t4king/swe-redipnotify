@@ -1,0 +1,1 @@
+0/30 * * * * /var/smoothwall/mods/redipnotify/red-change-notify.pl > /dev/null

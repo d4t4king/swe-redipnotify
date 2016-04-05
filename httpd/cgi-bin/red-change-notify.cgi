@@ -11,8 +11,10 @@ use Digest::SHA qw(sha1_hex);
 use header qw( :standard );
 use smoothtype qw( :standard );
 use strict;
+use warnings;
+use Data::Dumper;
 
-my (%cgiparams,%redchangesettings,%selected,%checked);
+my (%cgiparams,%redchangesettings,%checked);
 my $errormessage = "";
 my ($lastToken, $newToken, $rtnToken);
 my $tmp = "";
@@ -43,19 +45,12 @@ undef $time;
 undef $toSum;
 undef $tmp;
 
-$cgiparams{''} = '';
-$cgiparams{''} = '';
-
 &getcgihash(\%cgiparams);
 $rtnToken = $cgiparams{'Token'};
 
-&readhash("$swroot/mods/redipnotify/settings", \%redchangesettings);
-
-if ($cgiparams{'ACTION_ADMIN'} eq $tr{'save'} or $cgiparams{'ACTION_DIAL'} eq $tr{'save'})
-{
+if ($cgiparams{'btnSave'} eq $tr{'save'}) {
 	# Validate $rtnToken, then compare it with $newToken and $lastToken
-	if ($rtnToken !~ /[0-9a-f]/ or ($rtnToken != $newToken and $rtnToken != $lastToken))
-	{
+	if (($rtnToken !~ /[0-9a-f]/) or ($rtnToken != $newToken and $rtnToken != $lastToken)) {
 		$errormessage = "
 Incorrect security token; returning to home page!<br /><br />
 This happens when you wait too long to click an action button (Reboot/Shutdown/Save)<br />
@@ -78,13 +73,25 @@ END
 	}
 }
 
-$checked{'cbxRCNEnable'}{'on'} = '';
-$checked{'cbxRCNEnable'}{'off'} = '';
-$checked{'cbxRCNEnable'}{$redchangesettings{'enabled'}} = 'checked';
+&readhash("$swroot/mods/redipnotify/settings", \%redchangesettings);
 
-$selected{'ddlRCNMethod'}{'email'} = '';
-$selected{'ddlRCNMethod'}{'ssh'} = '';
-$selected{'ddlRCNMethod'}{$redchangesettings{'notify_method'}} = 'selected';
+$checked{'cbxRCNEnable'}{'enabled'} = '';
+$checked{'cbxRCNEnable'}{'disabled'} = '';
+$checked{'cbxRCNEnable'}{$redchangesettings{'notify'}} = 'checked';
+
+if ($cgiparams{'btnSave'} eq 'Save') {
+	if ($cgiparams{'cbxRCNEnable'} eq 'on') {
+		$redchangesettings{'notify'} = 'enabled';
+		system("sed -i -e 's/^#//' /var/smoothwall/mods/redipnotify/etc/crontab");
+	} else {
+		$redchangesettings{'notify'} = 'disabled';
+		system("sed -i -e 's/\(.*\)/#\1/' /var/smoothwall/mods/redipnotify/etc/crontab");
+	}
+
+	unless ($errormessage) {
+		&writehash("$swroot/mods/redipnotify/settings", \%redchangesettings);
+	}
+}
 
 &showhttpheaders();
 
@@ -104,28 +111,9 @@ print <<END;
 		<tr>
 			<td width='30%' class='base'>$tr{'rcnEnable'}</td>
 			<td width='15%'>
-				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" />
+				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" $checked{'cbdRCNEnable'}{$redchangesettings{'notify'}} />
 			</td>
-			<td width='25%' class='base'>$tr{'rcnddlMethod'}</td>
-			<td width='20%'>
-				<select name="ddlRCNMethod" id="ddlRCNMethod" value="$redchangesettings{'notify_method'}">
-					<option value="">&nbsp;</option>
-END
-	if ($redchangesettings{'notify_method'} eq "email") {
-		print "\t\t\t\t\t<option value=\"email\" selected>Email</option>\n";
-		print "\t\t\t\t\t<option value=\"ssh\">SSH</option>\n";
-	} elsif ($redchangesettings{'notify_method'} eq "ssh") {
-		print "\t\t\t\t\t<option value=\"email\">Email</option>\n";
-		print "\t\t\t\t\t<option value=\"ssh\" selected>SSH</option>\n";
-	} else {
-		print "\t\t\t\t\t<option value=\"email\">Email</option>\n";
-		print "\t\t\t\t\t<option value=\"ssh\">SSH</option>\n";
-		$errormessage = "Unrecognized notification method!";
-	}
-print <<END;
-
-				</select>
-			</td>
+			<td width='45%' class='base' colspan='2'>&nbsp;</td>
 		</tr>
 		<tr>
 			<td class='base'>$tr{'rcnEmailAddr'}</td>
@@ -164,31 +152,15 @@ print <<END;
 			</td>
 		</tr>
 		<tr>
-			<td class='base'>$tr{'rcnSSHServer'}</td>
-			<td>
-				<input type="text" size="25" id="txtRCNSSHServer" name="txtRCNSSHServer" value="$redchangesettings{'ssh_server'}" />
-			</td>
-			<td class='base'>$tr{'rcnSSHPort'}</td>
-			<td>
-				<input type="text" size="5" id="txtRCNSSHPort" name="txtRCNSSHPort" value="$redchangesettings{'ssh_port'}" />
-			</td>
-		</tr>
-		<tr>
-			<td class='base'>$tr{'rcnSSHAuthUser'}</td>
-			<td>
-				<input type="text" size="25" id="txtRCNSSHAuthUser" name="txtRCNSSHAuthUser" value="$redchangesettings{'ssh_auth_user'}" />
-			</td>
-			<td class="base">$tr{'rcnSSHAuthKey'}</td>
-			<td>
-				<input type="text" id="txtRCNSSHAuthKey" name="txtRCNSSHAuthKey" value="$redchangesettings{'ssh_auth_key'}" />
-			</td>
-		</tr>
-		<tr>
 			<td class='base' width="30%">&nbsp;</td>
-			<td colspan="3" width='60%'><input type='submit' name='ACTION_ADMIN' value='$tr{'save'}'></td>
+			<td colspan="3" width='60%'><input type='submit' id='btnSave' name='btnSave' value='$tr{'save'}'></td>
 		</tr>
 	</table>
 END
+
+&openbox($tr{'rcnDebug'});
+print Dumper(%cgiparams);
+&closebox();
 
 &closebox();
 
