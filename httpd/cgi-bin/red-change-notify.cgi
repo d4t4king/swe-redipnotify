@@ -12,7 +12,7 @@ use header qw( :standard );
 use smoothtype qw( :standard );
 use strict;
 
-my (%cgiparams,%redchangesettings);
+my (%cgiparams,%redchangesettings,%selected,%checked);
 my $errormessage = "";
 my ($lastToken, $newToken, $rtnToken);
 my $tmp = "";
@@ -43,8 +43,8 @@ undef $time;
 undef $toSum;
 undef $tmp;
 
-$cgiparams{'ACTION_ADMIN'} = '';
-$cgiparams{'ACTION_DIAL'} = '';
+$cgiparams{''} = '';
+$cgiparams{''} = '';
 
 &getcgihash(\%cgiparams);
 $rtnToken = $cgiparams{'Token'};
@@ -67,7 +67,7 @@ Content-type: text/html\r
 \r
 END
 
-		&openpage($tr{'change passwords'}, 1, '', 'maintenance');
+		&openpage($tr{'rcn page title: red change notification'}, 1, '', 'about');
 		&openbigbox('100%', 'LEFT');
 		&alertbox($errormessage);
 		print "<p style='margin:0'>&nbsp;</p>\n";
@@ -78,59 +78,16 @@ END
 	}
 }
 
+$checked{'cbxRCNEnable'}{'on'} = '';
+$checked{'cbxRCNEnable'}{'off'} = '';
+$checked{'cbxRCNEnable'}{$redchangesettings{'enabled'}} = 'checked';
+
+$selected{'ddlRCNMethod'}{'email'} = '';
+$selected{'ddlRCNMethod'}{'ssh'} = '';
+$selected{'ddlRCNMethod'}{$redchangesettings{'notify_method'}} = 'selected';
+
 &showhttpheaders();
 
-if ($cgiparams{'ACTION_ADMIN'} eq $tr{'save'})
-{
-	my $password1 = $cgiparams{'ADMIN_PASSWORD1'};
-	my $password2 = $cgiparams{'ADMIN_PASSWORD2'};
-	if ($password1 eq $password2)
-	{
-		if ($password1 =~ m/\s|\"/)
-		{
-			$errormessage .= $tr{'password contains illegal characters'} ."<br />\n";
-		}
-		elsif (length($password1) >= 6)
-		{
-			system('/usr/sbin/htpasswd', '-m', '-b', "${swroot}/auth/users", 'admin', "${password1}");
-			&log($tr{'admin user password has been changed'});
-		}
-		else
-		{
-			$errormessage .= $tr{'passwords must be at least 6 characters in length'} ."<br />\n";
-		}
-	}
-	else
-	{
-		$errormessage = $tr{'passwords do not match'} ."<br />\n";
-	}
-}
-
-if ($cgiparams{'ACTION_DIAL'} eq $tr{'save'})
-{
-	my $password1 = $cgiparams{'DIAL_PASSWORD1'};
-	my $password2 = $cgiparams{'DIAL_PASSWORD2'};
-	if ($password1 eq $password2)
-	{
-		if($password1 =~ m/\s|\"/)
-		{
-			$errormessage = $tr{'password contains illegal characters'} ."<br />\n";
-		}
-		elsif (length($password1) >= 6)
-		{
-			system('/usr/sbin/htpasswd', '-m', '-b', "${swroot}/auth/users", 'dial', "${password1}");
-			&log($tr{'dial user password has been changed'});
-		}
-		else
-		{
-			$errormessage = $tr{'passwords must be at least 6 characters in length'} ."<br />\n";
-		}
-	}
-	else
-	{
-		$errormessage = $tr{'passwords do not match'} ."<br />\n";
-	}
-}
 
 &openpage($tr{'rcn page title: red change notification'}, 1, '', 'maintenance');
 
