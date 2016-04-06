@@ -108,7 +108,7 @@ if ($cgiparams{'btnSave'} eq 'Save') {
 
 &alertbox($errormessage);
 
-print "<form method='post' action="$ENV{'SCRIPT_NAME'}\">\n";
+print "<form method='post' action=\"$ENV{'SCRIPT_NAME'}\">\n";
 print "  <input type='hidden' name='Token' value='$newToken'>\n";
 
 &openbox($tr{'rcn box title: red change notification'});
