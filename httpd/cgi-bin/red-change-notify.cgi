@@ -50,7 +50,7 @@ $rtnToken = $cgiparams{'Token'};
 
 if ($cgiparams{'btnSave'} eq $tr{'save'}) {
 	# Validate $rtnToken, then compare it with $newToken and $lastToken
-	if (($rtnToken !~ /[0-9a-f]/) or ($rtnToken != $newToken and $rtnToken != $lastToken)) {
+	if (($rtnToken !~ /[0-9a-f]/) or (($rtnToken ne $newToken) and ($rtnToken ne $lastToken))) {
 		$errormessage = "
 Incorrect security token; returning to home page!<br /><br />
 This happens when you wait too long to click an action button (Reboot/Shutdown/Save)<br />
@@ -88,6 +88,12 @@ if ($cgiparams{'btnSave'} eq 'Save') {
 		system("sed -i -e 's/\(.*\)/#\1/' /var/smoothwall/mods/redipnotify/etc/crontab");
 	}
 
+	$redchangesettings{'email'} = $cgiparams{'txtRCNEmailAddr'};
+	$redchangesettings{'email_smtp_server'} = $cgiparams{'txtRCNEmailServer'};
+	$redchangesettings{'email_smtp_port'} = $cgiparams{'txtRCNEmailPort'};
+	$redchangesettings{'email_auth_user'} = $cgiparams{'txtRCNEmailAuthUser'};
+	$redchangesettings{'email_auth_password'} = $cgiparams{'txtRCNEmailAuthPass'};
+	$redchangesettings{'email_ssl'} = $checked{'cbxRCNSSL'}{$cgiparams{'cbxRCNSSL'}};
 	unless ($errormessage) {
 		&writehash("$swroot/mods/redipnotify/settings", \%redchangesettings);
 	}
@@ -102,7 +108,7 @@ if ($cgiparams{'btnSave'} eq 'Save') {
 
 &alertbox($errormessage);
 
-print "<form method='post'>\n";
+print "<form method='post' action="$ENV{'SCRIPT_NAME'}\">\n";
 print "  <input type='hidden' name='Token' value='$newToken'>\n";
 
 &openbox($tr{'rcn box title: red change notification'});
@@ -111,7 +117,7 @@ print <<END;
 		<tr>
 			<td width='30%' class='base'>$tr{'rcnEnable'}</td>
 			<td width='15%'>
-				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" $checked{'cbdRCNEnable'}{$redchangesettings{'notify'}} />
+				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" $checked{'cbxRCNEnable'}{$redchangesettings{'notify'}} />
 			</td>
 			<td width='45%' class='base' colspan='2'>&nbsp;</td>
 		</tr>
@@ -135,7 +141,7 @@ print <<END;
 						</td>
 						<td class='base' width="12.5%">$tr{'rcnEmailSSL'}</td>
 						<td width="7%">
-							<input type="checkbox" id="cbxRCNSSL" name="cbxRCNSSL" />
+							<input type="checkbox" id="cbxRCNSSL" name="cbxRCNSSL" $checked{'cbxRCNSSL'}{$redchangesettings{'email_ssl'}} />
 						</td>
 					</tr>
 				</table>
@@ -159,7 +165,9 @@ print <<END;
 END
 
 &openbox($tr{'rcnDebug'});
-print Dumper(%cgiparams);
+print "<pre>\n";
+print Dumper(\%cgiparams);
+print "</pre>\n";
 &closebox();
 
 &closebox();
