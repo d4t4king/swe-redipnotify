@@ -75,16 +75,19 @@ END
 
 &readhash("$swroot/mods/redipnotify/settings", \%redchangesettings);
 
-$checked{'cbxRCNEnable'}{'enabled'} = '';
-$checked{'cbxRCNEnable'}{'disabled'} = '';
-$checked{'cbxRCNEnable'}{$redchangesettings{'notify'}} = 'checked';
+$checked{'cbxRCNEnable'}{'on'} = '';
+$checked{'cbxRCNEnable'}{'off'} = '';
+$checked{'cbxRCNEnable'}{$redchangesettings{'notify_enable'}} = 'checked';
+$checked{'cbxRCNSSL'}{'on'} = '';
+$checked{'cbxRCNSSL'}{'off'} = '';
+$checked{'cbxRCNSSL'}{$redchangesettings{'email_ssl'}} = 'checked';
 
 if ($cgiparams{'btnSave'} eq 'Save') {
 	if ($cgiparams{'cbxRCNEnable'} eq 'on') {
-		$redchangesettings{'notify'} = 'enabled';
+		$redchangesettings{'notify_enable'} = 'on';
 		system("sed -i -e 's/^#//' /var/smoothwall/mods/redipnotify/etc/crontab");
 	} else {
-		$redchangesettings{'notify'} = 'disabled';
+		$redchangesettings{'notify_enable'} = 'off';
 		system("sed -i -e 's/\(.*\)/#\1/' /var/smoothwall/mods/redipnotify/etc/crontab");
 	}
 
@@ -117,7 +120,7 @@ print <<END;
 		<tr>
 			<td width='30%' class='base'>$tr{'rcnEnable'}</td>
 			<td width='15%'>
-				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" $checked{'cbxRCNEnable'}{$redchangesettings{'notify'}} />
+				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" $checked{'cbxRCNEnable'}{$redchangesettings{'notify_enable'}} />
 			</td>
 			<td width='45%' class='base' colspan='2'>&nbsp;</td>
 		</tr>
@@ -165,8 +168,14 @@ print <<END;
 END
 
 &openbox($tr{'rcnDebug'});
+print "<h3>\%cgiparams</h3>\n";
 print "<pre>\n";
 print Dumper(\%cgiparams);
+print "</pre>\n";
+print "<hr />\n";
+print "<h3>\%redchangesettings</h3>\n";
+print "<pre> \n";
+print Dumper(\%redchangesettings);
 print "</pre>\n";
 &closebox();
 

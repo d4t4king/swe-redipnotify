@@ -1,11 +1,11 @@
 old_ip=
+notify_enable=off
 email_auth_password=
 red_iface=eth1
 email=
-email_ssl=
+email_ssl=checked
 email_auth_user=
 email_smtp_server=
-current_ip=
 new_ip=
-notify=enabled
+current_ip=
 email_smtp_port=25
