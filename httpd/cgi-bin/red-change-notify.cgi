@@ -78,10 +78,10 @@ END
 
 # Read the settings file and set defaults as needed (like if the file is empty)
 &readhash("$swroot/mods/redipnotify/settings", \%redchangesettings);
-if (not defined $redchangesettings{'notify_enable'} or $redchangesettings{'notify_enable'} eq '') {
+if ((not defined($redchangesettings{'notify_enable'})) or ($redchangesettings{'notify_enable'} eq '')) {
 	$redchangesettings{'notify_enable'} = 'off'
 }
-if (not defined $redchangesettings{'email_ssl'} or $redchangesettings{'email_ssl'} eq '') {
+if ((not defined($redchangesettings{'email_ssl'})) or ($redchangesettings{'email_ssl'} eq '')) {
 	$redchangesettings{'email_ssl'} = 'off'
 }
 $errormessage .= "<pre>Pre-save, %redchangesettings<br />". Dumper(\%redchangesettings) ."</pre>";
@@ -97,10 +97,8 @@ if ((defined($cgiparams{'btnSave'})) and ($cgiparams{'btnSave'} eq 'Save')) {
 	}
 	if (defined $cgiparams{'cbxRCNSSL'} and $cgiparams{'cbxRCNSSL'} eq 'on') {
 		$redchangesettings{'email_ssl'} = 'on';
-		system("sed -i -e 's/^#//' /var/smoothwall/mods/redipnotify/etc/crontab");
 	} else {
 		$redchangesettings{'email_ssl'} = 'off';
-		system("sed -i -e 's/\(.*\)/#\1/' /var/smoothwall/mods/redipnotify/etc/crontab");
 	}
 
 	$redchangesettings{'email'} = $cgiparams{'txtRCNEmailAddr'};
