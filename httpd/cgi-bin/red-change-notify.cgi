@@ -19,6 +19,9 @@ my $errormessage = "";
 my ($lastToken, $newToken, $rtnToken);
 my $tmp = "";
 
+# Get CGI hash now because we need to get the token
+&getcgihash(\%cgiparams);
+
 # Generate a new token and the previous token on each entry.
 foreach my $token ("1","2","3")
 {
@@ -45,10 +48,10 @@ undef $time;
 undef $toSum;
 undef $tmp;
 
-&getcgihash(\%cgiparams);
 $rtnToken = $cgiparams{'Token'};
 
-if ($cgiparams{'btnSave'} eq $tr{'save'}) {
+# Validate the security token
+if (defined $cgiparams{'btnSave'} and $cgiparams{'btnSave'} eq $tr{'save'}) {
 	# Validate $rtnToken, then compare it with $newToken and $lastToken
 	if (($rtnToken !~ /[0-9a-f]/) or (($rtnToken ne $newToken) and ($rtnToken ne $lastToken))) {
 		$errormessage = "
@@ -176,6 +179,11 @@ print "<hr />\n";
 print "<h3>\%redchangesettings</h3>\n";
 print "<pre> \n";
 print Dumper(\%redchangesettings);
+print "</pre>\n";
+print "<hr />\n";
+print "<h3>checked</h3>\n";
+print "<pre> \n";
+print Dumper(\%checked);
 print "</pre>\n";
 &closebox();
 
