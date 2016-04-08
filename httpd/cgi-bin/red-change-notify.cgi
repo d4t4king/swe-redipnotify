@@ -84,16 +84,21 @@ if ((not defined($redchangesettings{'notify_enable'})) or ($redchangesettings{'n
 if ((not defined($redchangesettings{'email_ssl'})) or ($redchangesettings{'email_ssl'} eq '')) {
 	$redchangesettings{'email_ssl'} = 'off'
 }
-$errormessage .= "<pre>Pre-save, %redchangesettings<br />". Dumper(\%redchangesettings) ."</pre>";
+# **** FIX ME ****
+# Can't print here because we haven't sent the HTTP headers yet.  But if
+# we put this output in $errormessage, it won't write to the settings config
+# file.
+#print "<pre>Pre-save, %redchangesettings<br />". Dumper(\%redchangesettings) ."</pre>\n";
 
 # Take actions before processing
 if ((defined($cgiparams{'btnSave'})) and ($cgiparams{'btnSave'} eq 'Save')) {
 	if ((defined($cgiparams{'cbxRCNEnable'})) and ($cgiparams{'cbxRCNEnable'} eq 'on')) {
 		$redchangesettings{'notify_enable'} = 'on';
-		system("sed -i -e 's/^#//' /var/smoothwall/mods/redipnotify/etc/crontab");
+		#system("sed -i -e 's/^#//' /var/smoothwall/mods/redipnotify/etc/crontab");
+		system("echo \"0/30 * * * * /var/smoothwall/mods/redipnotify/red-change-notify.pl > /dev/null\" > /var/smoothwall/mods/redipnotify/etc/crontab");
 	} else {
 		$redchangesettings{'notify_enable'} = 'off';
-		system("sed -i -e 's/\(.*\)/#\1/' /var/smoothwall/mods/redipnotify/etc/crontab");
+		system("echo -n > /var/smoothwall/mods/redipnotify/etc/crontab");
 	}
 	if (defined $cgiparams{'cbxRCNSSL'} and $cgiparams{'cbxRCNSSL'} eq 'on') {
 		$redchangesettings{'email_ssl'} = 'on';
@@ -109,7 +114,8 @@ if ((defined($cgiparams{'btnSave'})) and ($cgiparams{'btnSave'} eq 'Save')) {
 	unless ($errormessage) {
 		&writehash("$swroot/mods/redipnotify/settings", \%redchangesettings);
 	}
-	$errormessage .= "<pre>In save, %redchangesettings<br />". Dumper(\%redchangesettings) ."</pre>";
+	# Can't print here, because we haven't set the HTTP headers yet.
+	#print "<pre>In save, %redchangesettings<br />". Dumper(\%redchangesettings) ."</pre>\n";
 }
 
 # Set the 'checked' values now that the settings are correct
@@ -119,7 +125,7 @@ $checked{'cbxRCNEnable'}{$redchangesettings{'notify_enable'}} = 'checked="checke
 $checked{'cbxRCNSSL'}{'on'} = '';
 $checked{'cbxRCNSSL'}{'off'} = '';
 $checked{'cbxRCNSSL'}{$redchangesettings{'email_ssl'}} = 'checked="checked"';
-$errormessage .= "<pre>Post chkbox assure, %checked<br />". Dumper(\%checked) ."</pre>";
+#$errormessage .= "<pre>Post chkbox assure, %checked<br />". Dumper(\%checked) ."</pre>";
 
 
 # And finally render the page
@@ -188,22 +194,22 @@ print <<END;
 	</table>
 END
 
-&openbox($tr{'rcnDebug'});
-print "<h3>\%cgiparams</h3>\n";
-print "<pre>\n";
-print Dumper(\%cgiparams);
-print "</pre>\n";
-print "<hr />\n";
-print "<h3>\%redchangesettings</h3>\n";
-print "<pre> \n";
-print Dumper(\%redchangesettings);
-print "</pre>\n";
-print "<hr />\n";
-print "<h3>checked</h3>\n";
-print "<pre> \n";
-print Dumper(\%checked);
-print "</pre>\n";
-&closebox();
+#&openbox($tr{'rcnDebug'});
+#print "<h3>\%cgiparams</h3>\n";
+#print "<pre>\n";
+#print Dumper(\%cgiparams);
+#print "</pre>\n";
+#print "<hr />\n";
+#print "<h3>\%redchangesettings</h3>\n";
+#print "<pre> \n";
+#print Dumper(\%redchangesettings);
+#print "</pre>\n";
+#print "<hr />\n";
+#print "<h3>\%checked</h3>\n";
+#print "<pre> \n";
+#print Dumper(\%checked);
+#print "</pre>\n";
+#&closebox();
 
 &closebox();
 

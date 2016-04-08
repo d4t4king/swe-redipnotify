@@ -13,7 +13,7 @@ my %redipsettings;
 
 my ($red_iface, $old_ip, $current_ip, $new_ip);
 
-&readhash("$swroot/mods/red-change-notify/settings", \%redipsettings);
+&readhash("$swroot/mods/redipnotify/settings", \%redipsettings);
 
 $old_ip = $redipsettings{'old_ip'} or die colored("[!] old_ip was not set in the settings file! \n", "bold red");
 
@@ -54,5 +54,5 @@ if ($old_ip ne $new_ip) {
 	$msg->send('smtp', $redipsettings{'email_smtp_server'}, $redipsettings{'email_auth_user'}, $redipsettings{'email_auth_password'});
 }
 
-&writehash("$swroot/mods/red-change-notify/settings", \%redipsettings);
+&writehash("$swroot/mods/redipnotify/settings", \%redipsettings);
 

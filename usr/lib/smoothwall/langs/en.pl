@@ -2,9 +2,9 @@
 	
 	%basetr,
 
-	'rcn menu title: red change notification'	=>	'Red IP Change Notification',
-	'rcn page title: red change notification'	=>	'Red IP Change Notification',
-	'rcn box title: red change notification'	=>	'Red IP Change Notification',
+	'rcn menu title red change notification'	=>	'Red IP Change Notification',
+	'rcn page title red change notification'	=>	'Red IP Change Notification',
+	'rcn box title red change notification'		=>	'Red IP Change Notification',
 	'rcnredchangenotify'						=>	'Red IP Change Notification',
 	'rcnredchangenotify_tab'					=>	'red change notification',
 	'rcnEnable'									=>	'Enable Red IP Change Notification:',
