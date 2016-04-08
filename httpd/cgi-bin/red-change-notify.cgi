@@ -51,7 +51,7 @@ undef $tmp;
 $rtnToken = $cgiparams{'Token'};
 
 # Validate the security token
-if (defined $cgiparams{'btnSave'} and $cgiparams{'btnSave'} eq $tr{'save'}) {
+if ((defined $cgiparams{'btnSave'}) and ($cgiparams{'btnSave'} eq $tr{'save'})) {
 	# Validate $rtnToken, then compare it with $newToken and $lastToken
 	if (($rtnToken !~ /[0-9a-f]/) or (($rtnToken ne $newToken) and ($rtnToken ne $lastToken))) {
 		$errormessage = "
@@ -65,7 +65,7 @@ Content-type: text/html\r
 \r
 END
 
-		&openpage($tr{'rcn page title: red change notification'}, 1, '', 'about');
+		&openpage($tr{'rcn page title red change notification'}, 1, '', 'about');
 		&openbigbox('100%', 'LEFT');
 		&alertbox($errormessage);
 		print "<p style='margin:0'>&nbsp;</p>\n";
@@ -76,21 +76,30 @@ END
 	}
 }
 
+# Read the settings file and set defaults as needed (like if the file is empty)
 &readhash("$swroot/mods/redipnotify/settings", \%redchangesettings);
+if (not defined $redchangesettings{'notify_enable'} or $redchangesettings{'notify_enable'} eq '') {
+	$redchangesettings{'notify_enable'} = 'off'
+}
+if (not defined $redchangesettings{'email_ssl'} or $redchangesettings{'email_ssl'} eq '') {
+	$redchangesettings{'email_ssl'} = 'off'
+}
+$errormessage .= "<pre>Pre-save, %redchangesettings<br />". Dumper(\%redchangesettings) ."</pre>";
 
-$checked{'cbxRCNEnable'}{'on'} = '';
-$checked{'cbxRCNEnable'}{'off'} = '';
-$checked{'cbxRCNEnable'}{$redchangesettings{'notify_enable'}} = 'checked';
-$checked{'cbxRCNSSL'}{'on'} = '';
-$checked{'cbxRCNSSL'}{'off'} = '';
-$checked{'cbxRCNSSL'}{$redchangesettings{'email_ssl'}} = 'checked';
-
-if ($cgiparams{'btnSave'} eq 'Save') {
-	if ($cgiparams{'cbxRCNEnable'} eq 'on') {
+# Take actions before processing
+if ((defined($cgiparams{'btnSave'})) and ($cgiparams{'btnSave'} eq 'Save')) {
+	if ((defined($cgiparams{'cbxRCNEnable'})) and ($cgiparams{'cbxRCNEnable'} eq 'on')) {
 		$redchangesettings{'notify_enable'} = 'on';
 		system("sed -i -e 's/^#//' /var/smoothwall/mods/redipnotify/etc/crontab");
 	} else {
 		$redchangesettings{'notify_enable'} = 'off';
+		system("sed -i -e 's/\(.*\)/#\1/' /var/smoothwall/mods/redipnotify/etc/crontab");
+	}
+	if (defined $cgiparams{'cbxRCNSSL'} and $cgiparams{'cbxRCNSSL'} eq 'on') {
+		$redchangesettings{'email_ssl'} = 'on';
+		system("sed -i -e 's/^#//' /var/smoothwall/mods/redipnotify/etc/crontab");
+	} else {
+		$redchangesettings{'email_ssl'} = 'off';
 		system("sed -i -e 's/\(.*\)/#\1/' /var/smoothwall/mods/redipnotify/etc/crontab");
 	}
 
@@ -99,16 +108,27 @@ if ($cgiparams{'btnSave'} eq 'Save') {
 	$redchangesettings{'email_smtp_port'} = $cgiparams{'txtRCNEmailPort'};
 	$redchangesettings{'email_auth_user'} = $cgiparams{'txtRCNEmailAuthUser'};
 	$redchangesettings{'email_auth_password'} = $cgiparams{'txtRCNEmailAuthPass'};
-	$redchangesettings{'email_ssl'} = $checked{'cbxRCNSSL'}{$cgiparams{'cbxRCNSSL'}};
 	unless ($errormessage) {
 		&writehash("$swroot/mods/redipnotify/settings", \%redchangesettings);
 	}
+	$errormessage .= "<pre>In save, %redchangesettings<br />". Dumper(\%redchangesettings) ."</pre>";
 }
 
+# Set the 'checked' values now that the settings are correct
+$checked{'cbxRCNEnable'}{'on'} = '';
+$checked{'cbxRCNEnable'}{'off'} = '';
+$checked{'cbxRCNEnable'}{$redchangesettings{'notify_enable'}} = 'checked="checked"';
+$checked{'cbxRCNSSL'}{'on'} = '';
+$checked{'cbxRCNSSL'}{'off'} = '';
+$checked{'cbxRCNSSL'}{$redchangesettings{'email_ssl'}} = 'checked="checked"';
+$errormessage .= "<pre>Post chkbox assure, %checked<br />". Dumper(\%checked) ."</pre>";
+
+
+# And finally render the page
 &showhttpheaders();
 
 
-&openpage($tr{'rcn page title: red change notification'}, 1, '', 'maintenance');
+&openpage($tr{'rcn page title red change notification'}, 1, '', 'maintenance');
 
 &openbigbox('100%', 'LEFT');
 
@@ -117,13 +137,13 @@ if ($cgiparams{'btnSave'} eq 'Save') {
 print "<form method='post' action=\"$ENV{'SCRIPT_NAME'}\">\n";
 print "  <input type='hidden' name='Token' value='$newToken'>\n";
 
-&openbox($tr{'rcn box title: red change notification'});
+&openbox($tr{'rcn box title red change notification'});
 print <<END;
 	<table width='100%' border="0">
 		<tr>
 			<td width='30%' class='base'>$tr{'rcnEnable'}</td>
 			<td width='15%'>
-				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" $checked{'cbxRCNEnable'}{$redchangesettings{'notify_enable'}} />
+				<input type="checkbox" id="cbxRCNEnable" name="cbxRCNEnable" $checked{'cbxRCNEnable'}{'on'}} />
 			</td>
 			<td width='45%' class='base' colspan='2'>&nbsp;</td>
 		</tr>
@@ -147,7 +167,7 @@ print <<END;
 						</td>
 						<td class='base' width="12.5%">$tr{'rcnEmailSSL'}</td>
 						<td width="7%">
-							<input type="checkbox" id="cbxRCNSSL" name="cbxRCNSSL" $checked{'cbxRCNSSL'}{$redchangesettings{'email_ssl'}} />
+							<input type="checkbox" id="cbxRCNSSL" name="cbxRCNSSL" $checked{'cbxRCNSSL'}{'on'}} />
 						</td>
 					</tr>
 				</table>
