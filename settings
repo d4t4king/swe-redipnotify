@@ -6,6 +6,6 @@ email=
 email_ssl=off
 email_auth_user=
 email_smtp_server=
-current_ip=
 new_ip=
+current_ip=
 email_smtp_port=25
