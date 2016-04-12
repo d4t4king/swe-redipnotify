@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use feature qw( switch );
+use Data::Dumper;
+use Term::ANSIColor;
+use Getopt::Long qw( :config no_ignore_case bundling );
+
+my ($help,$verbose);
+$verbose = 0;
+GetOptions(
+	'h|help'		=>	\$help,
+	'v|verbose+'	=>	\$verbose,
+);
+
+if ($help) { &usage(); }
+
+# check how we were called
+given ($0) {
+	when (/\.\/install/) {
+		# install the mod
+		print colored("We want to install the mod! \n", "bold green");
+	}
+	when (/\.\/uninstall/) {
+		# remove the mod
+		#     Make a backup/tarball and stick it in /tmp or something
+		#     don't completely remove it.  Leave that as an exercise 
+		#     for the user.
+		print colored("Are you sure you want to remove this mod? \n", "bold yellow");
+	}
+	default {
+		# we shoudl never get here
+		print colored("We should never actually get here.  \n", "bold red");
+	}
+}
+
+###############################################################################
+# Subs
+###############################################################################
+sub usage {
+
+	print <<END;
+
+Usage: $0 [-h|--help] [-v|--verbose]
+
+Options:
+-h|--help			Displays this useful message.
+-v|--verbose		Displays extra output.
+
+END
+	exit 0;
+}
