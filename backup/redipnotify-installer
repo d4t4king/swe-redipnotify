@@ -7,6 +7,9 @@ use Data::Dumper;
 use Term::ANSIColor;
 use Getopt::Long qw( :config no_ignore_case bundling );
 
+use lib "/usr/lib/smoothwall";
+use header qw( :standard );
+
 my ($help,$verbose);
 $verbose = 0;
 GetOptions(
@@ -16,11 +19,25 @@ GetOptions(
 
 if ($help) { &usage(); }
 
+my %redipmodsettings;
+
 # check how we were called
 given ($0) {
 	when (/\.\/install/) {
 		# install the mod
 		print colored("We want to install the mod! \n", "bold green");
+		print colored("First we need to install some perl modules.\n", "bold green");
+		print colored("You will be prompted by the CPAN perl module.  It should be safe to accept all of the defaults.\n", "bold green");
+		system("cpan App::cpanminus");
+		system("cpan install CPAN");
+		system("cpanm MIME::Lite");
+		&readhash("settings", \%redipmodsettings);
+		open IN, "</var/smoothwall/red/local-ipaddress" or die colored("There was a problem reading the RED IP settings: $!", "bold red");
+		$redipmodsettings{'old_ip'} = readline(IN);
+		chomp($redipmodsettings{'old_ip'});
+		close IN or die colored("There was a problem closing the RED IP settings file after reading: $!", "bold red");
+		&writehash("settings", \%redipmodsettings);
+		system("pushd /var/smoothwall/mods; /bin/ln -snf ../mods-available/redipnotify redipnotify");
 	}
 	when (/\.\/uninstall/) {
 		# remove the mod
@@ -28,6 +45,10 @@ given ($0) {
 		#     don't completely remove it.  Leave that as an exercise 
 		#     for the user.
 		print colored("Are you sure you want to remove this mod? \n", "bold yellow");
+		my $ans = readline();
+		if ($ans =~ /[Yy](?:es)?/) {
+			exit 0;
+		}
 	}
 	default {
 		# we shoudl never get here

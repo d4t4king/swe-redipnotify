@@ -4,7 +4,9 @@ use strict;
 use warnings;
 use Term::ANSIColor;
 use Data::Dumper;
-use MIME::Lite;
+
+push @INC, "/var/smoothwall/mods-available/redipnotify/usr/lib/perl5/site_perl/5.14.4";
+require MIME::Lite;
 
 use lib "/usr/lib/smoothwall/";
 use header qw( :standard );
