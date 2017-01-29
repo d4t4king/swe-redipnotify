@@ -37,6 +37,7 @@ given ($0) {
 		chomp($redipmodsettings{'old_ip'});
 		close IN or die colored("There was a problem closing the RED IP settings file after reading: $!", "bold red");
 		&writehash("settings", \%redipmodsettings);
+		system("pushd /var/smoothwall/mods; /bin/ln -snf ../mods-available/redipnotify redipnotify");
 	}
 	when (/\.\/uninstall/) {
 		# remove the mod
@@ -44,6 +45,10 @@ given ($0) {
 		#     don't completely remove it.  Leave that as an exercise 
 		#     for the user.
 		print colored("Are you sure you want to remove this mod? \n", "bold yellow");
+		my $ans = readline();
+		if ($ans =~ /[Yy](?:es)?/) {
+			exit 0;
+		}
 	}
 	default {
 		# we shoudl never get here
