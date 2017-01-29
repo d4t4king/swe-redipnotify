@@ -184,7 +184,7 @@ print <<END;
 			</td>
 			<td class="base">$tr{'rcnEmailAuthPass'}</td>
 			<td>
-				<input type="text" id="txtRCNEmailAuthPass" name="txtRCNEmailAuthPass" value="$redchangesettings{'email_auth_password'}" />
+				<input type="password" id="txtRCNEmailAuthPass" name="txtRCNEmailAuthPass" value="$redchangesettings{'email_auth_password'}" />
 			</td>
 		</tr>
 		<tr>
