@@ -40,10 +40,30 @@ given ($0) {
 		my $cwd = getcwd();
 		given ($cwd) {
 			when ("/var/smoothwall/mods-available/redipnotify") {
-				# in the mod directory
+				# in the mod directorydev
+				print "Looks like you're in the mod directory.  Do you want to install this mod on your smoothie?";
+				my $ans = readline();
+				chomp($ans);
+				if ($ans =~ /[Yy](?:es)?/) {
+					system("/bin/cp -f settings.skel settings");
+				} else {
+					print colored("Quitting!\n", "bold red");
+					exit 0;
+				}
 			}
-			when ("/tmp/") {
+			when ("/tmp/iredipnotify") {
 				# in the tmp directory
+				print "Looks like you're in the tmp directory.  Do you want to install this mod on your smoothie?";
+				my $ans = readline();
+				chomp($ans);
+				if ($ans =~ /[Yy](?:es)?/) {
+					system("/bin/mkdir -p /var/smoothwall/mods-available/redipnotify") unless ( -d "/var/smoothwall/mods-available/redipnotify");
+					system("/bin/cp -rf * /var/smoothwall/mods-available/redipnotify/");
+					system("/bin/cp -f /var/smoothwall/mods-available/redipnotify/settings.skel /var/smoothwall/mods-available/redipnotify/settings");
+				} else {
+					print colored("Quitting!\n", "bold red");
+					exit 0;
+				}
 			}
 			when ("/root/swe-redipnotify") {
 				print "Looks like you're in the dev directory.  Do you want to install this mod on your smoothie?";
@@ -52,7 +72,7 @@ given ($0) {
 				if ($ans =~ /[Yy](?:es)?/) {
 					system("/bin/mkdir -p /var/smoothwall/mods-available/redipnotify") unless ( -d "/var/smoothwall/mods-available/redipnotify");
 					system("/bin/cp -rf * /var/smoothwall/mods-available/redipnotify/");
-					system("cp -f /var/smoothwall/mods-available/redipnotify/settings.skel /var/smoothwall/mods-available/redipnotify/settings");
+					system("/bin/cp -f /var/smoothwall/mods-available/redipnotify/settings.skel /var/smoothwall/mods-available/redipnotify/settings");
 				} else {
 					print colored("Quitting!\n", "bold red");
 					exit 0;
@@ -66,7 +86,9 @@ given ($0) {
 		chomp($redipmodsettings{'old_ip'});
 		close IN or die colored("There was a problem closing the RED IP settings file after reading: $!", "bold red");
 		&writehash("/var/smoothwall/mods-available/redipnotify/settings", \%redipmodsettings);
-		system("chown nobody:nobody /var/smoothwall/mods-available/redipnotify/settings");
+		system("/bin/chown nobody:nobody /var/smoothwall/mods-available/redipnotify/settings");
+		system("/bin/chown -R nobody:nobody /var/smoothwall/mods-available/redipnotify/httpd/cgi-bin");
+		system("/bin/chown nobody:nobody /var/smoothwall/mods-available/redipnotify");
 		system("pushd /var/smoothwall/mods; /bin/ln -snf ../mods-available/redipnotify redipnotify");
 	}
 	when (/\.\/uninstall/) {
@@ -74,9 +96,10 @@ given ($0) {
 		#     Make a backup/tarball and stick it in /tmp or something
 		#     don't completely remove it.  Leave that as an exercise 
 		#     for the user.
-		print colored("Are you sure you want to remove this mod? \n", "bold yellow");
+		print colored("Are you sure you want to disable this mod? \n", "bold yellow");
 		my $ans = readline();
 		if ($ans =~ /[Yy](?:es)?/) {
+			system("/bin/rm -rf /var/smoothwall/mods-available/redipnotify");
 			exit 0;
 		}
 	}
