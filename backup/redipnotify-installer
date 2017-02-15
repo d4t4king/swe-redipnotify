@@ -66,6 +66,7 @@ given ($0) {
 		chomp($redipmodsettings{'old_ip'});
 		close IN or die colored("There was a problem closing the RED IP settings file after reading: $!", "bold red");
 		&writehash("/var/smoothwall/mods-available/redipnotify/settings", \%redipmodsettings);
+		system("chown nobody:nobody /var/smoothwall/mods-available/redipnotify/settings");
 		system("pushd /var/smoothwall/mods; /bin/ln -snf ../mods-available/redipnotify redipnotify");
 	}
 	when (/\.\/uninstall/) {
