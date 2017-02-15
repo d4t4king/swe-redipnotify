@@ -6,6 +6,7 @@ use feature qw( switch );
 use Data::Dumper;
 use Term::ANSIColor;
 use Getopt::Long qw( :config no_ignore_case bundling );
+use Cwd;
 
 use lib "/usr/lib/smoothwall";
 use header qw( :standard );
@@ -26,17 +27,45 @@ given ($0) {
 	when (/\.\/install/) {
 		# install the mod
 		print colored("We want to install the mod! \n", "bold green");
-		print colored("First we need to install some perl modules.\n", "bold green");
-		print colored("You will be prompted by the CPAN perl module.  It should be safe to accept all of the defaults.\n", "bold green");
-		system("cpan App::cpanminus");
-		system("cpan install CPAN");
-		system("cpanm MIME::Lite");
+		my $retval = system("/usr/bin/perl -mMIME::Lite -e ';' > /dev/null 2>&1");
+		if ($retval == 0) {
+			print colored("It looks like the require perl modules are already present.\n", "bold green");
+		} else {
+			print colored("First we need to install some perl modules.\n", "bold green");
+			print colored("You will be prompted by the CPAN perl module.  It should be safe to accept all of the defaults.\n", "bold green");
+			system("cpan App::cpanminus");
+			system("cpan install CPAN");
+			system("cpanm MIME::Lite");
+		}
+		my $cwd = getcwd();
+		given ($cwd) {
+			when ("/var/smoothwall/mods-available/redipnotify") {
+				# in the mod directory
+			}
+			when ("/tmp/") {
+				# in the tmp directory
+			}
+			when ("/root/swe-redipnotify") {
+				print "Looks like you're in the dev directory.  Do you want to install this mod on your smoothie?";
+				my $ans = readline();
+				chomp($ans);
+				if ($ans =~ /[Yy](?:es)?/) {
+					system("/bin/mkdir -p /var/smoothwall/mods-available/redipnotify") unless ( -d "/var/smoothwall/mods-available/redipnotify");
+					system("/bin/cp -rf * /var/smoothwall/mods-available/redipnotify/");
+					system("cp -f /var/smoothwall/mods-available/redipnotify/settings.skel /var/smoothwall/mods-available/redipnotify/settings");
+				} else {
+					print colored("Quitting!\n", "bold red");
+					exit 0;
+				}
+			}
+			default { die colored("Unrecognized mod directory: $cwd ", "bold red"); }
+		}
 		&readhash("settings", \%redipmodsettings);
 		open IN, "</var/smoothwall/red/local-ipaddress" or die colored("There was a problem reading the RED IP settings: $!", "bold red");
 		$redipmodsettings{'old_ip'} = readline(IN);
 		chomp($redipmodsettings{'old_ip'});
 		close IN or die colored("There was a problem closing the RED IP settings file after reading: $!", "bold red");
-		&writehash("settings", \%redipmodsettings);
+		&writehash("/var/smoothwall/mods-available/redipnotify/settings", \%redipmodsettings);
 		system("pushd /var/smoothwall/mods; /bin/ln -snf ../mods-available/redipnotify redipnotify");
 	}
 	when (/\.\/uninstall/) {
@@ -67,7 +96,7 @@ Usage: $0 [-h|--help] [-v|--verbose]
 
 Options:
 -h|--help			Displays this useful message.
--v|--verbose		Displays extra output.
+-v|--verbose			Displays extra output.
 
 END
 	exit 0;

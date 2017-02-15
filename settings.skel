@@ -1,0 +1,10 @@
+old_ip=''
+notify_enable=off
+email_auth_password=''
+red_iface=''
+email=''
+email_auth_user=''
+email_smtp_server=''
+current_ip=''
+new_ip=''
+email_smtp_port=''
