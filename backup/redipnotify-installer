@@ -60,7 +60,7 @@ given ($0) {
 			}
 			default { die colored("Unrecognized mod directory: $cwd ", "bold red"); }
 		}
-		&readhash("settings", \%redipmodsettings);
+		&readhash("/var/smoothwall/mods-available/redipnotify/settings", \%redipmodsettings);
 		open IN, "</var/smoothwall/red/local-ipaddress" or die colored("There was a problem reading the RED IP settings: $!", "bold red");
 		$redipmodsettings{'old_ip'} = readline(IN);
 		chomp($redipmodsettings{'old_ip'});
