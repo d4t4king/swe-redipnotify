@@ -131,7 +131,6 @@ $checked{'cbxRCNSSL'}{$redchangesettings{'email_ssl'}} = 'checked="checked"';
 # And finally render the page
 &showhttpheaders();
 
-
 &openpage($tr{'rcn page title red change notification'}, 1, '', 'maintenance');
 
 &openbigbox('100%', 'LEFT');
