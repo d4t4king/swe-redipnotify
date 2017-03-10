@@ -1,5 +1,5 @@
 MOD_DIR=/var/smoothwall/mods/redipnotify
 MOD_NAME=redipnotify
 MOD_VERSION=0.0.1
-MOD_LONG_NAME="Red IP Change Notification"
+MOD_LONG_NAME="[3.1] Red IP Change Notification"
 MOD_AUTHOR="dataking"
